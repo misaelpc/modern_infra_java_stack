@@ -1,6 +1,7 @@
 #Ignore cursor AI rules
 .cursor/rules/codacy.mdc
 .codacy/
+app/target/
 
 .terraform/
 *.tfstate
