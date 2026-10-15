@@ -1,0 +1,13 @@
+#Ignore cursor AI rules
+.cursor/rules/codacy.mdc
+.codacy/
+
+.terraform/
+*.tfstate
+*.tfstate.*
+.terraform.tfstate.lock.info
+crash.log
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json

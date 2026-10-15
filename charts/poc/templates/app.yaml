@@ -1,0 +1,68 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: poc
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: poc
+  template:
+    metadata:
+      labels:
+        app: poc
+    spec:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 65534
+      containers:
+        - name: poc
+          image: {{ .Values.image }}
+          securityContext:
+            allowPrivilegeEscalation: false
+          ports:
+            - containerPort: 8080
+          env:
+            - name: MONGO_URI
+              valueFrom:
+                secretKeyRef:
+                  name: poc-secrets
+                  key: mongo-connection-string
+            - name: ETIQUETA
+              valueFrom:
+                secretKeyRef:
+                  name: poc-secrets
+                  key: etiqueta
+            - name: MONGO_ROOT_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: poc-secrets
+                  key: mongo-root-password
+          volumeMounts:
+            - name: banner
+              mountPath: /secrets/banner
+              readOnly: true
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 8080
+            initialDelaySeconds: 5
+            periodSeconds: 5
+      volumes:
+        - name: banner
+          secret:
+            secretName: poc-secrets
+            items:
+              - key: banner
+                path: banner.txt
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: poc
+spec:
+  selector:
+    app: poc
+  ports:
+    - port: 8080
+      targetPort: 8080
